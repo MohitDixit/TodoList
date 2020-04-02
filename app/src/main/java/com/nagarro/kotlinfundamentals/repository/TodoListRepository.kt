@@ -6,19 +6,11 @@ import io.reactivex.Observable
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 @Singleton
 class TodoListRepository @Inject constructor(
     private val apiInterface: ApiInterface
 ) {
     internal fun getDataFromApi(): Observable<List<TodoData>> {
         return apiInterface.getJsonResponse()
-          /*  .doAfterNext {
-*//*
-                for (item in it) {
-                    orderDao.insert(item)
-                }
-*//*
-            }*/
     }
 }

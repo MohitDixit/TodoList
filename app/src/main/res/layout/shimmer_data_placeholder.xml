@@ -11,10 +11,10 @@
         android:layout_marginTop="@dimen/padding_10"
         android:layout_marginEnd="@dimen/activityPadding"
         android:layout_marginRight="@dimen/activityPadding"
-        android:background="@color/background" />
+        android:background="@drawable/circular_shimmer_item" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_10"
         android:layout_toEndOf="@id/thumbnail"
@@ -23,13 +23,14 @@
 
         <View
             android:layout_width="100dp"
+            android:layout_marginTop="@dimen/dp_5"
             android:layout_height="@dimen/placeholderTextHeight"
-            android:background="@color/background" />
+            android:background="@drawable/rectangle_curve_shimmer" />
 
         <View
-            android:layout_width="30dp"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/placeholderTextHeight"
-            android:layout_marginTop="5dp"
-            android:background="@color/background" />
+            android:layout_marginTop="@dimen/dp_15"
+            android:background="@drawable/rectangle_curve_shimmer" />
     </LinearLayout>
 </RelativeLayout>

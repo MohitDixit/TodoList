@@ -1,8 +1,8 @@
 package com.nagarro.kotlinfundamentals
 
 import android.app.Application
+import com.nagarro.kotlinfundamentals.di.ContextModule
 import com.nagarro.kotlinfundamentals.di.DaggerAppComponent
-import com.nagarro.kotlinfundamentals.di.NetworkModule
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
@@ -17,7 +17,7 @@ class TodoApp : Application(), HasAndroidInjector {
     override fun onCreate() {
         super.onCreate()
         DaggerAppComponent.builder()
-            .networkModule(NetworkModule(this))
+            .contextModule(ContextModule(this))
             .build()
             .inject(this)
     }

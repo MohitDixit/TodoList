@@ -42,7 +42,10 @@ class TodoListActivity : AppCompatActivity() {
     lateinit var apiInterface: ApiInterface
     private val compositeDisposable by lazy { CompositeDisposable() }
     private var isLoading: Boolean = false
-    private val utils = Utils(this)
+    @Inject
+    lateinit var todoListActivityViewModelFactory: TodoListActivityViewModelFactory
+    @Inject
+    lateinit var utils: Utils
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,10 +58,9 @@ class TodoListActivity : AppCompatActivity() {
         val activityTodoListBinding: ActivityTodoListBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_todo_list)
         todoListActivityViewModel =
-            ViewModelProviders.of(this, TodoListActivityViewModelFactory(apiInterface))
+            ViewModelProviders.of(this, todoListActivityViewModelFactory)
                 .get(TodoListActivityViewModel::class.java)
         activityTodoListBinding.todoListActivityViewModel = todoListActivityViewModel
-        activityTodoListBinding.lifecycleOwner = this
         setUpViews(activityTodoListBinding)
     }
 
@@ -79,7 +81,7 @@ class TodoListActivity : AppCompatActivity() {
                 if (it != null && it.isNotEmpty()) {
                     todoListAdapter.addTodos(it)
                     recyclerView.adapter = todoListAdapter
-                } else if (Utils(this).isConnectedToInternet()) {
+                } else if (utils.isConnectedToInternet()) {
                     loadData()
                 } else {
                     Toast.makeText(this, getString(R.string.error_no_internet), Toast.LENGTH_SHORT)
@@ -121,7 +123,7 @@ class TodoListActivity : AppCompatActivity() {
                 coRoutineScope.launch {
                     todoListActivityViewModel.loadTodoList()
                 }
-            }, 2000)
+            }, 1000)
         }
     }
 
