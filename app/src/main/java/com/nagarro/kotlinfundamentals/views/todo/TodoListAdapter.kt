@@ -24,7 +24,12 @@ class TodoListAdapter(private val todoList: List<TodoData>) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding =
-            DataBindingUtil.inflate<TodoListItemBinding>(layoutInflater, R.layout.todo_list_item, parent, false)
+            DataBindingUtil.inflate<TodoListItemBinding>(
+                layoutInflater,
+                R.layout.todo_list_item,
+                parent,
+                false
+            )
         return ItemViewHolder(binding)
     }
 
@@ -37,7 +42,7 @@ class TodoListAdapter(private val todoList: List<TodoData>) :
         return todoList.size
     }
 
-    fun addTodos(orders: List<TodoData>) {
+    fun addToDos(orders: List<TodoData>) {
         val initPosition = todoList.size
         todoListItems.addAll(orders)
         Log.e("list size", todoListItems.size.toString())
@@ -49,10 +54,12 @@ class TodoListAdapter(private val todoList: List<TodoData>) :
     }
 
 
-    class ItemViewHolder(private val binding: TodoListItemBinding) : RecyclerView.ViewHolder(binding.root){
+    class ItemViewHolder(private val binding: TodoListItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bindItems(
             model: TodoData,
-            todoListActivityViewModel: TodoListActivityViewModel) {
+            todoListActivityViewModel: TodoListActivityViewModel
+        ) {
             todoListActivityViewModel.setOrderValue(model)
             binding.todoListActivityViewModel = todoListActivityViewModel
             binding.executePendingBindings()

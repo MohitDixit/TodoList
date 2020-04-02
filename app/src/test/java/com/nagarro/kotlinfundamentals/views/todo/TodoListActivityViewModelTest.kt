@@ -5,18 +5,20 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.nagarro.kotlinfundamentals.api.ApiInterface
 import com.nagarro.kotlinfundamentals.api.model.TodoData
 import com.nagarro.kotlinfundamentals.repository.TodoListRepository
-import io.reactivex.Observable
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
 import junit.framework.Assert.assertEquals
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
-import org.mockito.*
-import org.mockito.Mockito.times
-import org.mockito.Mockito.verify
+import org.mockito.InjectMocks
+import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.MockitoAnnotations
 import javax.inject.Inject
 
 
@@ -36,17 +38,6 @@ class TodoListActivityViewModelTest {
     @InjectMocks
     lateinit var todoListRepository: TodoListRepository
 
-    private inline fun <reified T> mock(): T = Mockito.mock(T::class.java)
-
-    @Mock
-    lateinit var observer: androidx.lifecycle.Observer<List<TodoData>>
-
-    @Mock
-    lateinit var errorObserver: androidx.lifecycle.Observer<Throwable>
-
-    @Mock
-    lateinit var loaderObserver: androidx.lifecycle.Observer<Boolean>
-
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
@@ -55,12 +46,6 @@ class TodoListActivityViewModelTest {
         RxJavaPlugins.setNewThreadSchedulerHandler { Schedulers.trampoline() }
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
         todoListActivityViewModel = TodoListActivityViewModel(todoListRepository)
-        observer = mock()
-        errorObserver = mock()
-        loaderObserver = mock()
-        todoListActivityViewModel.todoListResult().observeForever(observer)
-        todoListActivityViewModel.todoListError().observeForever(errorObserver)
-        todoListActivityViewModel.todoListLoader().observeForever(loaderObserver)
     }
 
     @Test
@@ -96,48 +81,42 @@ class TodoListActivityViewModelTest {
         assertEquals(Color.RED, todoListActivityViewModel.color)
     }
 
+    @ExperimentalCoroutinesApi
     @Test
     fun loadTodoListTest() {
         val todoData = TodoData()
         todoData.title = "Sam"
         todoData.completed = false
         val list = listOf(todoData)
-        Mockito.`when`(todoListRepository.getDataFromApi()).thenReturn(Observable.just(list))
-        Mockito.`when`(apiInterface.getJsonResponse()).thenReturn(Observable.just(list))
-        todoListActivityViewModel.loadTodoList()
-        val captor = ArgumentCaptor.forClass(TodoData::class.java)
-        captor.run {
-            verify(observer, times(1)).onChanged(listOf(capture()))
-            assertEquals(list, value)
+        runBlockingTest {
+            Mockito.`when`(apiInterface.getJsonResponse()).thenReturn(list)
+            todoListActivityViewModel.loadTodoList()
+            assertEquals(list, todoListActivityViewModel.todoListResult().value)
         }
     }
 
+    @ExperimentalCoroutinesApi
     @Test
     fun loadTodoListTestError() {
-        val throwable = Throwable()
-        Mockito.`when`(todoListRepository.getDataFromApi()).thenReturn(Observable.error(throwable))
-        Mockito.`when`(apiInterface.getJsonResponse()).thenReturn(Observable.error(throwable))
-        todoListActivityViewModel.loadTodoList()
-        val captor = ArgumentCaptor.forClass(Throwable::class.java)
-        captor.run {
-            verify(errorObserver, times(1)).onChanged(capture())
-            assertEquals(throwable, value)
+        val throwable = RuntimeException()
+        runBlockingTest {
+            Mockito.`when`(apiInterface.getJsonResponse()).thenThrow(throwable)
+            todoListActivityViewModel.loadTodoList()
+            assertEquals(throwable, todoListActivityViewModel.todoListError().value)
         }
     }
 
+    @ExperimentalCoroutinesApi
     @Test
     fun loadTodoListTestLoader() {
         val todoData = TodoData()
         todoData.title = "Sam"
         todoData.completed = false
         val list = listOf(todoData)
-        Mockito.`when`(todoListRepository.getDataFromApi()).thenReturn(Observable.just(list))
-        Mockito.`when`(apiInterface.getJsonResponse()).thenReturn(Observable.just(list))
-        todoListActivityViewModel.loadTodoList()
-        val captor = ArgumentCaptor.forClass(Boolean::class.java)
-        captor.run {
-            verify(loaderObserver, times(1)).onChanged(capture())
-            assertEquals(false, value)
+        runBlockingTest {
+            Mockito.`when`(apiInterface.getJsonResponse()).thenReturn(list)
+            todoListActivityViewModel.loadTodoList()
+            assertEquals(false, todoListActivityViewModel.todoListLoader().value)
         }
     }
 }

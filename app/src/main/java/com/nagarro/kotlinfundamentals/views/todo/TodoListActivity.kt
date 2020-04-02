@@ -42,8 +42,10 @@ class TodoListActivity : AppCompatActivity() {
     lateinit var apiInterface: ApiInterface
     private val compositeDisposable by lazy { CompositeDisposable() }
     private var isLoading: Boolean = false
+
     @Inject
     lateinit var todoListActivityViewModelFactory: TodoListActivityViewModelFactory
+
     @Inject
     lateinit var utils: Utils
 
@@ -79,7 +81,7 @@ class TodoListActivity : AppCompatActivity() {
             Observer {
                 isLoading = false
                 if (it != null && it.isNotEmpty()) {
-                    todoListAdapter.addTodos(it)
+                    todoListAdapter.addToDos(it)
                     recyclerView.adapter = todoListAdapter
                 } else if (utils.isConnectedToInternet()) {
                     loadData()

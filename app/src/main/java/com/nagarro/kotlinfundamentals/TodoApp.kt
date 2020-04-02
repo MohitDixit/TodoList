@@ -21,5 +21,6 @@ class TodoApp : Application(), HasAndroidInjector {
             .build()
             .inject(this)
     }
+
     override fun androidInjector(): AndroidInjector<Any> = activityDispatchingAndroidInjector
 }

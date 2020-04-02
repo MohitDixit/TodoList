@@ -23,8 +23,8 @@
 
         <View
             android:layout_width="100dp"
-            android:layout_marginTop="@dimen/dp_5"
             android:layout_height="@dimen/placeholderTextHeight"
+            android:layout_marginTop="@dimen/dp_5"
             android:background="@drawable/rectangle_curve_shimmer" />
 
         <View

@@ -23,7 +23,7 @@ class Utils @Inject constructor(private val context: Context) {
 
     fun showViews(vararg views: View?) {
         views.forEach {
-         it?.visibility = View.VISIBLE
+            it?.visibility = View.VISIBLE
         }
     }
 

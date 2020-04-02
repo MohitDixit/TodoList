@@ -5,68 +5,56 @@ import android.graphics.Color
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.nagarro.kotlinfundamentals.BuildConfig
 import com.nagarro.kotlinfundamentals.api.model.TodoData
 import com.nagarro.kotlinfundamentals.repository.TodoListRepository
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.observers.DisposableObserver
-import io.reactivex.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class TodoListActivityViewModel @Inject constructor(
-    private val orderListRepository: TodoListRepository) :
+    private val orderListRepository: TodoListRepository
+) :
     ViewModel() {
     lateinit var title: String
     lateinit var isComplete: String
     var color = Color.BLACK
-    val status= arrayListOf("Completed","Not Completed")
-    var orderListResult: MutableLiveData<List<TodoData>> = MutableLiveData()
-    var orderListError: MutableLiveData<Throwable> = MutableLiveData()
-    var orderListLoader: MutableLiveData<Boolean> = MutableLiveData()
-    private lateinit var disposableObserver: DisposableObserver<List<TodoData>>
+    val status = arrayListOf("Completed", "Not Completed")
+    private var todoListResult: MutableLiveData<List<TodoData>> = MutableLiveData()
+    private var todoListError: MutableLiveData<Throwable> = MutableLiveData()
+    private var todoListLoader: MutableLiveData<Boolean> = MutableLiveData()
 
     fun todoListResult(): LiveData<List<TodoData>> {
-        return orderListResult
+        return todoListResult
     }
 
     fun todoListError(): LiveData<Throwable> {
-        return orderListError
+        return todoListError
     }
 
     fun todoListLoader(): LiveData<Boolean> {
-        return orderListLoader
+        return todoListLoader
     }
 
     fun setOrderValue(todoData: TodoData) {
-         this.title = todoData.title
-         this.isComplete = if(todoData.completed){
-             status[0]
-         }else status[1]
+        this.title = todoData.title
+        this.isComplete = if (todoData.completed) {
+            status[0]
+        } else status[1]
         setStatusColor()
     }
 
-    fun setStatusColor(){
-        color =  if(isComplete==status[0]){
-           Color.GREEN
-        }else  Color.RED
+    fun setStatusColor() {
+        color = if (isComplete == status[0]) {
+            Color.GREEN
+        } else Color.RED
     }
-    fun loadTodoList() {
-        disposableObserver = object : DisposableObserver<List<TodoData>>() {
-            override fun onComplete() {}
-            override fun onNext(orders: List<TodoData>) {
-                orderListResult.postValue(orders)
-                orderListLoader.postValue(false)
-            }
-            override fun onError(e: Throwable) {
-                orderListError.postValue(e)
-                orderListLoader.postValue(false)
-            }
+
+    suspend fun loadTodoList() {
+        try {
+            val orders: List<TodoData> = orderListRepository.getDataFromApi()
+            todoListResult.postValue(orders)
+            todoListLoader.postValue(false)
+        } catch (e: Throwable) {
+            todoListError.postValue(e)
+            todoListLoader.postValue(false)
         }
-        orderListRepository.getDataFromApi()
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .debounce(BuildConfig.timeout, TimeUnit.MILLISECONDS)
-            .subscribe(disposableObserver)
     }
 }
