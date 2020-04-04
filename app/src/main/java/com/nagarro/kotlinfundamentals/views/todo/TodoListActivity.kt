@@ -21,11 +21,9 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.nagarro.kotlinfundamentals.R
-import com.nagarro.kotlinfundamentals.api.ApiInterface
 import com.nagarro.kotlinfundamentals.databinding.ActivityTodoListBinding
 import com.nagarro.kotlinfundamentals.util.Utils
 import dagger.android.AndroidInjection
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_todo_list.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,15 +35,9 @@ import javax.inject.Inject
 class TodoListActivity : AppCompatActivity() {
     private lateinit var todoListActivityViewModel: TodoListActivityViewModel
     private var todoListAdapter = TodoListAdapter(ArrayList())
-
-    @Inject
-    lateinit var apiInterface: ApiInterface
-    private val compositeDisposable by lazy { CompositeDisposable() }
     private var isLoading: Boolean = false
-
     @Inject
     lateinit var todoListActivityViewModelFactory: TodoListActivityViewModelFactory
-
     @Inject
     lateinit var utils: Utils
 
@@ -160,10 +152,5 @@ class TodoListActivity : AppCompatActivity() {
         )
         errorTextView.movementMethod = LinkMovementMethod.getInstance()
         errorTextView.text = spannableString
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        compositeDisposable.dispose()
     }
 }

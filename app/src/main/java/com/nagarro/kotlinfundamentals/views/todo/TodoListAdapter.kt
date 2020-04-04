@@ -1,6 +1,5 @@
 package com.nagarro.kotlinfundamentals.views.todo
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -45,14 +44,12 @@ class TodoListAdapter(private val todoList: List<TodoData>) :
     fun addToDos(orders: List<TodoData>) {
         val initPosition = todoList.size
         todoListItems.addAll(orders)
-        Log.e("list size", todoListItems.size.toString())
         notifyItemRangeInserted(initPosition, todoListItems.size)
     }
 
     fun setViewModel(todoListActivityViewModel: TodoListActivityViewModel) {
         this.todoListActivityViewModel = todoListActivityViewModel
     }
-
 
     class ItemViewHolder(private val binding: TodoListItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
