@@ -3,8 +3,8 @@
 
     <data>
 
-        <variable
-            name="todoListActivityViewModel"
+         <variable
+            name="todoListViewModel"
             type="com.nagarro.kotlinfundamentals.views.todo.TodoListActivityViewModel" />
     </data>
 
@@ -35,6 +35,8 @@
 
         <com.facebook.shimmer.ShimmerFrameLayout
             android:id="@+id/shimmerFrameLayout"
+            shimmer="@{todoListViewModel.isShimmerShow()}"
+            visibility="@{todoListViewModel.isShimmerShow(), default=gone}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/toolbar"
@@ -64,22 +66,20 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/todoRecyclerView"
+            visibility="@{todoListViewModel.isListShow(), default=gone}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/toolbar"
-            android:visibility="gone" />
+            android:layout_below="@+id/toolbar" />
 
         <TextView
             android:id="@+id/errorTextView"
+            visibility="@{todoListViewModel.isErrorShow(), default=gone}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:gravity="center"
             android:text="@string/error_retry_string"
-            android:textSize="@dimen/sp_16"
-            android:visibility="gone" />
+            android:textSize="@dimen/sp_16" />
 
     </RelativeLayout>
-
-
 </layout>

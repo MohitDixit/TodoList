@@ -1,6 +1,6 @@
 package com.nagarro.kotlinfundamentals
 
-import android.app.Application
+import androidx.multidex.MultiDexApplication
 import com.nagarro.kotlinfundamentals.di.ContextModule
 import com.nagarro.kotlinfundamentals.di.DaggerAppComponent
 import dagger.android.AndroidInjector
@@ -9,7 +9,7 @@ import dagger.android.HasAndroidInjector
 import javax.inject.Inject
 
 
-class TodoApp : Application(), HasAndroidInjector {
+class TodoApp : MultiDexApplication(), HasAndroidInjector {
 
     @Inject
     lateinit var activityDispatchingAndroidInjector: DispatchingAndroidInjector<Any>

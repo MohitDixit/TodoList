@@ -21,7 +21,6 @@ import javax.inject.Singleton
 
 @Module
 class NetworkModule {
-
     @Provides
     @Singleton
     fun provideGson(): Gson {
@@ -34,10 +33,8 @@ class NetworkModule {
     fun provideOkHttpClient(context:Context): OkHttpClient {
         val interceptor = HttpLoggingInterceptor()
         interceptor.level = HttpLoggingInterceptor.Level.BASIC
-
         val cacheDir = File(context.cacheDir, UUID.randomUUID().toString())
         val cache = Cache(cacheDir, BuildConfig.cacheSize * BuildConfig.cacheUnit * BuildConfig.cacheUnit)
-
         return OkHttpClient.Builder()
             .cache(cache)
             .connectTimeout(BuildConfig.connTimeout, TimeUnit.SECONDS)

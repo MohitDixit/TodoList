@@ -4,4 +4,5 @@
     <string name="error_retry_string"><b>Something went wrong</b>\n\n Give it another try\n\n <b>RELOAD</b></string>
     <string name="error_no_internet">No Internet Connection</string>
     <string name="reload">RELOAD</string>
+    <string name="give">Give</string>
 </resources>

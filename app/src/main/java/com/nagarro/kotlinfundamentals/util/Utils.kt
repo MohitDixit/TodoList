@@ -1,9 +1,10 @@
+@file:Suppress("DEPRECATION")
+
 package com.nagarro.kotlinfundamentals.util
 
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
-import android.view.View
 import javax.inject.Inject
 
 
@@ -19,17 +20,5 @@ class Utils @Inject constructor(private val context: Context) {
                 return true
             }
         return false
-    }
-
-    fun showViews(vararg views: View?) {
-        views.forEach {
-            it?.visibility = View.VISIBLE
-        }
-    }
-
-    fun hideViews(vararg views: View?) {
-        views.forEach {
-            it?.visibility = View.GONE
-        }
     }
 }

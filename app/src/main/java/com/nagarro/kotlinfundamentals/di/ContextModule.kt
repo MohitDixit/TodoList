@@ -13,6 +13,7 @@ class ContextModule(private val context: Context) {
     @Provides
     @Singleton
     fun provideContext(): Context = context
+
     @Provides
     @Singleton
     fun provideTodoListActivityViewModelFactory(

@@ -4,7 +4,7 @@
     <data>
 
         <variable
-            name="todoListActivityViewModel"
+            name="todoListViewModel"
             type="com.nagarro.kotlinfundamentals.views.todo.TodoListActivityViewModel" />
     </data>
 
@@ -23,7 +23,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/dp_10"
-                android:text="@{todoListActivityViewModel.title}"
+                android:text="@{todoListViewModel.title}"
                 android:textColor="@color/black"
                 android:textSize="@dimen/sp_18" />
 
@@ -35,8 +35,8 @@
                 android:layout_marginLeft="@dimen/dp_10"
                 android:layout_marginTop="@dimen/dp_10"
                 android:layout_marginBottom="@dimen/dp_10"
-                android:text="@{todoListActivityViewModel.isComplete}"
-                android:textColor="@{todoListActivityViewModel.color}"
+                android:text="@{todoListViewModel.isComplete}"
+                android:textColor="@{todoListViewModel.color}"
                 android:textSize="@dimen/sp_18" />
         </LinearLayout>
 

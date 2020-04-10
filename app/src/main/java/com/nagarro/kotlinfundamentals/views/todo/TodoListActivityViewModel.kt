@@ -5,21 +5,26 @@ import android.graphics.Color
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.nagarro.kotlinfundamentals.api.model.TodoData
 import com.nagarro.kotlinfundamentals.repository.TodoListRepository
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class TodoListActivityViewModel @Inject constructor(
     private val orderListRepository: TodoListRepository
-) :
-    ViewModel() {
+) : ViewModel() {
     lateinit var title: String
     lateinit var isComplete: String
+    private var isLoading = false
     var color = Color.BLACK
-    val status = arrayListOf("Completed", "Not Completed")
-    private var todoListResult: MutableLiveData<List<TodoData>> = MutableLiveData()
-    private var todoListError: MutableLiveData<Throwable> = MutableLiveData()
-    private var todoListLoader: MutableLiveData<Boolean> = MutableLiveData()
+    val isListShow by lazy { MutableLiveData<Boolean>() }
+    val isErrorShow by lazy { MutableLiveData<Boolean>() }
+    val isShimmerShow by lazy { MutableLiveData<Boolean>() }
+    val status by lazy { arrayListOf("Completed", "Not Completed") }
+    private val todoListResult by lazy { MutableLiveData<List<TodoData>>() }
+    private val todoListError by lazy { MutableLiveData<Throwable>() }
 
     fun todoListResult(): LiveData<List<TodoData>> {
         return todoListResult
@@ -29,32 +34,50 @@ class TodoListActivityViewModel @Inject constructor(
         return todoListError
     }
 
-    fun todoListLoader(): LiveData<Boolean> {
-        return todoListLoader
-    }
-
     fun setOrderValue(todoData: TodoData) {
-        this.title = todoData.title
-        this.isComplete = if (todoData.completed) {
+        title = todoData.title
+        isComplete = if (todoData.completed) {
             status[0]
         } else status[1]
         setStatusColor()
     }
 
     fun setStatusColor() {
-        color = if (isComplete == status[0]) {
-            Color.GREEN
-        } else Color.RED
+        color = when (isComplete) {
+            status[0] -> Color.GREEN
+            else -> Color.RED
+        }
     }
 
-    suspend fun loadTodoList() {
-        try {
-            val orders: List<TodoData> = orderListRepository.getDataFromApi()
-            todoListResult.postValue(orders)
-            todoListLoader.postValue(false)
-        } catch (e: Throwable) {
-            todoListError.postValue(e)
-            todoListLoader.postValue(false)
+    fun loadTodoList() {
+        if (!isLoading) {
+            setLoadingIndicators(isLoad = true)
+            viewModelScope.launch {
+                delay(1000)
+                try {
+                    val orders: List<TodoData> = orderListRepository.getDataFromApi()
+                    todoListResult.postValue(orders)
+                    setViewIndicators(isOK = true)
+                } catch (e: Throwable) {
+                    todoListError.postValue(e)
+                    setViewIndicators(isOK = false)
+                } finally {
+                    setLoadingIndicators(isLoad = false)
+                }
+            }
+        }
+    }
+
+    private fun setViewIndicators(isOK: Boolean) {
+        isListShow.postValue(isOK)
+        isErrorShow.postValue(!isOK)
+    }
+
+    private fun setLoadingIndicators(isLoad: Boolean) {
+        isLoading = isLoad
+        isShimmerShow.postValue(isLoad)
+        when (isLoad) {
+            true -> isErrorShow.postValue(!isLoad)
         }
     }
 }

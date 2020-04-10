@@ -9,6 +9,5 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules = [AndroidInjectionModule::class, ContextModule::class, NetworkModule::class, ActivityBuilder::class])
 interface AppComponent {
-
     fun inject(app: TodoApp)
 }

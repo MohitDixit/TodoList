@@ -5,11 +5,13 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.nagarro.kotlinfundamentals.api.ApiInterface
 import com.nagarro.kotlinfundamentals.api.model.TodoData
 import com.nagarro.kotlinfundamentals.repository.TodoListRepository
-import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.plugins.RxJavaPlugins
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -32,20 +34,28 @@ class TodoListActivityViewModelTest {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
+    @ExperimentalCoroutinesApi
+    private val testDispatcher = TestCoroutineDispatcher()
+
     @Mock
     lateinit var apiInterface: ApiInterface
 
     @InjectMocks
     lateinit var todoListRepository: TodoListRepository
 
+    @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        RxJavaPlugins.setIoSchedulerHandler { Schedulers.trampoline() }
-        RxJavaPlugins.setComputationSchedulerHandler { Schedulers.trampoline() }
-        RxJavaPlugins.setNewThreadSchedulerHandler { Schedulers.trampoline() }
-        RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
         todoListActivityViewModel = TodoListActivityViewModel(todoListRepository)
+        Dispatchers.setMain(testDispatcher)
+    }
+
+    @ExperimentalCoroutinesApi
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+        testDispatcher.cleanupTestCoroutines()
     }
 
     @Test
@@ -88,9 +98,10 @@ class TodoListActivityViewModelTest {
         todoData.title = "Sam"
         todoData.completed = false
         val list = listOf(todoData)
-        runBlockingTest {
-            Mockito.`when`(apiInterface.getJsonResponse()).thenReturn(list)
+        testDispatcher.runBlockingTest {
+            Mockito.`when`(todoListRepository.getDataFromApi()).thenReturn(list)
             todoListActivityViewModel.loadTodoList()
+            advanceTimeBy(1000)
             assertEquals(list, todoListActivityViewModel.todoListResult().value)
         }
     }
@@ -99,24 +110,11 @@ class TodoListActivityViewModelTest {
     @Test
     fun loadTodoListTestError() {
         val throwable = RuntimeException()
-        runBlockingTest {
+        testDispatcher.runBlockingTest {
             Mockito.`when`(apiInterface.getJsonResponse()).thenThrow(throwable)
             todoListActivityViewModel.loadTodoList()
+            advanceTimeBy(1000)
             assertEquals(throwable, todoListActivityViewModel.todoListError().value)
-        }
-    }
-
-    @ExperimentalCoroutinesApi
-    @Test
-    fun loadTodoListTestLoader() {
-        val todoData = TodoData()
-        todoData.title = "Sam"
-        todoData.completed = false
-        val list = listOf(todoData)
-        runBlockingTest {
-            Mockito.`when`(apiInterface.getJsonResponse()).thenReturn(list)
-            todoListActivityViewModel.loadTodoList()
-            assertEquals(false, todoListActivityViewModel.todoListLoader().value)
         }
     }
 }

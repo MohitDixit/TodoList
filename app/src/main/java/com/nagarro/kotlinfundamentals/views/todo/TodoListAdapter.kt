@@ -58,8 +58,10 @@ class TodoListAdapter(private val todoList: List<TodoData>) :
             todoListActivityViewModel: TodoListActivityViewModel
         ) {
             todoListActivityViewModel.setOrderValue(model)
-            binding.todoListActivityViewModel = todoListActivityViewModel
-            binding.executePendingBindings()
+            with(binding) {
+                todoListViewModel = todoListActivityViewModel
+                executePendingBindings()
+            }
         }
     }
 }
